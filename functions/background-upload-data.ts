@@ -17,10 +17,8 @@ const myHandler: Handler = async (
     statusCode: 200,
   };
 };
-
 export { handler };
 
-// };
 const handler = schedule("* * * * *", myHandler);
 
 const rabbitmqconsume = async (exchange: any) => {

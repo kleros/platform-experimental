@@ -1,8 +1,8 @@
 import { Logtail } from "@logtail/node";
 import client, { Connection, Channel, ConsumeMessage, Message } from "amqplib";
-import { consumers } from "stream";
-const logtail = new Logtail("tEL7p1rqCXc1oTJxG1zfCJ8p");
-
+const logtail = new Logtail(process.env.LOGTAILKEY);
+import * as dotenv from "dotenv";
+dotenv.config();
 async function rabbitMqConnection() {
   // consumer for the queue.
   // We use currying to give it the channel required to acknowledge the message
@@ -16,12 +16,10 @@ async function rabbitMqConnection() {
           .replace("False", "false");
         console.log(a);
         channel.ack(msg);
-        await logtail.info( JSON.parse(a));
+        await logtail.info(JSON.parse(a));
       }
     };
-  const connection: Connection = await client.connect(
-    "amqps://gbvfmiqs:5QBmlTOSx_FsewCRK2mvo6Gp0_620nzZ@shark.rmq.cloudamqp.com/gbvfmiqs"
-  );
+  const connection: Connection = await client.connect(process.env.RABBITMQ_URL);
   console.log("connection");
 
   // Create a channel
@@ -30,7 +28,7 @@ async function rabbitMqConnection() {
   // Makes the queue available to the client
   let k = await channel.assertQueue("datalake");
   console.log(k, "queue");
-  await channel.sendToQueue("datalake",Buffer.from("demo"))
+  await channel.sendToQueue("datalake", Buffer.from("demo"));
   // Start the consumer
   await channel.consume("datalake", consumer(channel));
 }
