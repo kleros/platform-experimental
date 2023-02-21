@@ -1,0 +1,11 @@
+version: '3'
+  # Testing purposes
+  # docker-compose build && docker-compose up 
+services:
+  datalake-consumer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - LOGTAIL_KEY=""
+      - RABBITMQ_URL=""
