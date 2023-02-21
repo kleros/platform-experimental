@@ -1,5 +1,6 @@
 {
   "devDependencies": {
+    "@logtail/node": "^0.2.0",
     "@netlify/functions": "^1.4.0",
     "@types/amqplib": "^0.10.1",
     "@types/node": "^18.13.0",
