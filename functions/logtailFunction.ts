@@ -28,7 +28,7 @@ async function rabbitMqConnection() {
   // Makes the queue available to the client
   let k = await channel.assertQueue("datalake");
   console.log(k, "queue");
-  await channel.sendToQueue("datalake", Buffer.from("demo"));
+ // await channel.sendToQueue("datalake", Buffer.from("demo"));
   // Start the consumer
   await channel.consume("datalake", consumer(channel));
 }
