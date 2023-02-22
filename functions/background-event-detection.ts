@@ -1,17 +1,4 @@
 import { Handler, HandlerEvent, HandlerContext, schedule } from "@netlify/functions";
-<<<<<<< HEAD
-
-const upload_report: Handler = async (event: HandlerEvent, context: HandlerContext) => {
-  console.log("Received event:", event);
-  // Logic in English: Attach as a durable queue called reporting to the Filebase Exchange on RabbitMQ
-  // From there, once a day this cron (as a Netlify background function) runs.
-  // Objective: A daily report of all new CIDs, and upload that report back to Filebase
-  // Cronjob ends
-
-  // If this design pattern works well, we'll implement a lot more flows like this (i.e. for Tokens Curate)
-
-  return {
-=======
 import { ethers } from "ethers";
 import fetch from "node-fetch";
 import { createClient } from '@supabase/supabase-js'
@@ -127,20 +114,11 @@ const main: Handler = async (event: HandlerEvent, context: HandlerContext) => {
     console.log(update_db)
 
     return {
->>>>>>> 7b86bae (feat(wip) generalized event listener)
         statusCode: 200,
     };
 };
 
-<<<<<<< HEAD
-const handler = schedule("@daily", upload_report)
-
-export { handler };
-
-=======
 const handler = schedule("*/15 * * * *", main)
 
 export { handler };
 
-
->>>>>>> 7b86bae (feat(wip) generalized event listener)
