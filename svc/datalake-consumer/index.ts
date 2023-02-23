@@ -1,42 +1,53 @@
+
+import amqp, { Message } from "amqplib/callback_api";
 import { Logtail } from "@logtail/node";
-import client, { Connection, Channel, ConsumeMessage, Message } from "amqplib";
-const logtail = new Logtail(process.env.LOGTAIL_KEY || "null");
-
-
-async function rabbitMqConnection() {
-  // consumer for the queue.
-  // We use currying to give it the channel required to acknowledge the message
-  const consumer =
-    (channel: Channel) =>
-    async (msg: ConsumeMessage | null): Promise<void> => {
-      if (msg) {
-        let a = msg.content
-          .toString()
-          .replace(/'/g, '"')
-          .replace("False", "false");
-        console.log(a);
-        channel.ack(msg);
-        await logtail.info(JSON.parse(a));
+require("dotenv").config();
+const logtail = new Logtail( process.env.LOGTAILKEY|| "");
+amqp.connect(
+  process.env.RABBITMQ_URL || "http://localhost:5672",
+  function (error0: any, connection: any) {
+    if (error0) {
+      throw error0;
+    }
+    connection.createChannel(function (error1: any, channel: any) {
+      if (error1) {
+        throw error1;
       }
-    };
-  const connection: Connection = await client.connect(process.env.RABBITMQ_URL || "http://localhost:5672");
-  console.log("connection");
 
-  // Create a channel
-  const channel: Channel = await connection.createChannel();
-  console.log("channel");
-  // Makes the queue available to the client
-  let k = await channel.assertQueue("datalake");
-  console.log(k, "queue");
-  // Start the consumer
-  await channel.consume("datalake", consumer(channel));
-}
-rabbitMqConnection()
-  .then(async () => {
-    await new Promise((f) => setTimeout(f, 10000));
-    process.exit(0);
-  })
-  .catch((error) => {
-    console.error(error);
-    process.exit(1);
-  });
+      channel.assertQueue(
+        "datalake",
+        {
+          durable: true,
+        },
+        function (error2: any, q: any) {
+          if (error2) {
+            throw error2;
+          }
+          console.log(
+            "[*] Waiting for messages in %s. To exit press CTRL+C",
+          );
+
+          channel.consume(
+            q.queue,
+            async function (msg: any) {
+              if (msg.content) {
+                console.log(" [x] %s", msg.content.toString());
+
+                await logtail.info(
+                   JSON.parse( msg.content
+                      .toString()
+                      .replace(/'/g, '"')
+                      .replace("False", "false")
+                  
+                ));
+              }
+            },
+            {
+              noAck: true,
+            }
+          );
+        }
+      );
+    });
+  }
+);
