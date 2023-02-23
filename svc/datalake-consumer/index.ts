@@ -1,8 +1,6 @@
-
 import amqp, { Message } from "amqplib/callback_api";
 import { Logtail } from "@logtail/node";
-require("dotenv").config();
-const logtail = new Logtail( process.env.LOGTAILKEY|| "");
+const logtail = new Logtail( process.env.LOGTAIL_KEY || "");
 amqp.connect(
   process.env.RABBITMQ_URL || "http://localhost:5672",
   function (error0: any, connection: any) {
@@ -40,11 +38,9 @@ amqp.connect(
                       .replace("False", "false")
                   
                 ));
+                await channel.ack(msg);
               }
-            },
-            {
-              noAck: true,
-            }
+            }  
           );
         }
       );
